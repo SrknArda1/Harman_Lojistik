@@ -1,0 +1,737 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — HarmanLojistik{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ust-cubuk {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .guncelleme-gosterge {
+        font-size: 0.8rem;
+        color: #475569;
+    }
+
+    .filtre-cubugu {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: flex-end;
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .filtre-grup label {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #475569;
+        margin-bottom: 0.35rem;
+    }
+
+    .filtre-grup select {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #E2E8F0;
+        border-radius: 8px;
+        background: #FAFAFA;
+        color: #1A1C1E;
+        font-size: 0.9rem;
+        min-width: 160px;
+    }
+
+    .btn {
+        padding: 0.55rem 1.1rem;
+        border-radius: 8px;
+        border: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .btn-vurgu {
+        background: #E11D48;
+        color: #FFFFFF;
+    }
+
+    .btn-vurgu:hover { background: #BE123C; }
+    .btn-vurgu:disabled { background: #FDA4AF; cursor: not-allowed; }
+
+    .btn-ikincil {
+        background: #FFFFFF;
+        color: #475569;
+        border: 1px solid #E2E8F0;
+    }
+
+    .btn-ikincil:hover { border-color: #E11D48; color: #E11D48; }
+
+    .ozet-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .kritik-bolum { margin-bottom: 2rem; }
+
+    .kritik-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1rem;
+    }
+
+    .kritik-bos {
+        color: #475569;
+        font-size: 0.95rem;
+        padding: 1rem;
+        background: #F0FDF4;
+        border: 1px solid #BBF7D0;
+        border-radius: 8px;
+    }
+
+    .grafik-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .grafik-kart .bolum-baslik { margin-bottom: 0.75rem; }
+
+    .chart-kapsayici {
+        position: relative;
+        height: 280px;
+    }
+
+    .alt-bolum {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .grafik-grid { grid-template-columns: 1fr; }
+        .alt-bolum { grid-template-columns: 1fr; }
+    }
+
+    .bilgi-etiket {
+        display: inline-block;
+        background: #F1F5F9;
+        color: #475569;
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        margin-right: 0.4rem;
+    }
+
+    .korelasyon-kutu { display: flex; gap: 1.5rem; margin-top: 0.75rem; }
+
+    .korelasyon-item {
+        background: #F8FAFC;
+        padding: 0.75rem 1.25rem;
+        border-radius: 8px;
+        border: 1px solid #E2E8F0;
+    }
+
+    .korelasyon-item strong {
+        display: block;
+        font-size: 1.25rem;
+        color: #E11D48;
+    }
+
+    .png-bolum { margin-bottom: 2rem; }
+    .png-etiket {
+        font-size: 0.75rem;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Silo tablosu */
+    .tablo-arac {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    .arama-kutusu {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #E2E8F0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        min-width: 240px;
+    }
+
+    .tablo th.siralanabilir {
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .tablo th.siralanabilir:hover { color: #E11D48; }
+
+    .skor-yesil { color: #15803D; font-weight: 700; }
+    .skor-sari { color: #CA8A04; font-weight: 700; }
+    .skor-kirmizi { color: #E11D48; font-weight: 700; }
+
+    .sayfalama {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .sayfalama button {
+        padding: 0.35rem 0.75rem;
+        border: 1px solid #E2E8F0;
+        background: #FFFFFF;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        color: #475569;
+    }
+
+    .sayfalama button:hover:not(:disabled) { border-color: #E11D48; color: #E11D48; }
+    .sayfalama button.aktif { background: #E11D48; color: #FFFFFF; border-color: #E11D48; }
+    .sayfalama button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .sayfalama-bilgi { font-size: 0.85rem; color: #475569; margin-left: auto; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Üst çubuk: güncelleme + yeni veri -->
+<div class="ust-cubuk">
+    <span class="guncelleme-gosterge" id="son-guncelleme">Son güncelleme: --:--:--</span>
+    <button type="button" class="btn btn-vurgu" id="btn-yeni-veri">Yeni Veri Üret</button>
+</div>
+
+<!-- Filtre çubuğu -->
+<form class="filtre-cubugu" id="filtre-form" method="get" action="/">
+    <div class="filtre-grup">
+        <label for="kategori">Kategori</label>
+        <select name="kategori" id="kategori">
+            {% for k in kategoriler %}
+            <option value="{{ k }}" {% if filtreler.kategori == k %}selected{% endif %}>{{ k }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="filtre-grup">
+        <label for="rota">Rota</label>
+        <select name="rota" id="rota">
+            {% for r in rotalar %}
+            <option value="{{ r }}" {% if filtreler.rota == r %}selected{% endif %}>{{ r }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="filtre-grup">
+        <label for="tarih_araligi">Tarih Aralığı</label>
+        <select name="tarih_araligi" id="tarih_araligi">
+            {% for t in tarih_araliklari %}
+            <option value="{{ t }}" {% if filtreler.tarih_araligi == t %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-ikincil">Filtrele</button>
+</form>
+
+<!-- Özet kartlar -->
+<section class="ozet-grid">
+    <div class="kart">
+        <div class="kart-baslik">Toplam Silo</div>
+        <div class="kart-deger" id="ozet-silo">{{ ozet.toplam_silo }}</div>
+        <div class="kart-birim">aktif depo birimi</div>
+    </div>
+    <div class="kart">
+        <div class="kart-baslik">Ortalama Doluluk</div>
+        <div class="kart-deger" id="ozet-doluluk">{{ ozet.ortalama_doluluk }}<span style="font-size:1.2rem">%</span></div>
+        <div class="kart-birim">tüm silolar</div>
+    </div>
+    <div class="kart">
+        <div class="kart-baslik">Ortalama Fire</div>
+        <div class="kart-deger" id="ozet-fire">{{ ozet.ortalama_fire }}<span style="font-size:1.2rem">%</span></div>
+        <div class="kart-birim">ürün kaybı oranı</div>
+    </div>
+    <div class="kart">
+        <div class="kart-baslik">Kritik Stok</div>
+        <div class="kart-deger" id="ozet-kritik">{{ ozet.kritik_sayisi }}</div>
+        <div class="kart-birim">düşük doluluk uyarısı</div>
+    </div>
+</section>
+
+<!-- Kritik stok uyarıları -->
+<section class="kritik-bolum">
+    <h2 class="bolum-baslik">Kritik Stok Uyarıları</h2>
+    <div id="kritik-konteyner">
+        {% if kritik_stok %}
+        <div class="kritik-grid" id="kritik-grid">
+            {% for item in kritik_stok %}
+            <div class="kritik-kart">
+                <div class="silo-id">{{ item.silo_id }}</div>
+                <div>{{ item.urun_adi }} &mdash; {{ item.kategori }}</div>
+                <div style="margin-top:0.4rem">
+                    <span class="bilgi-etiket">Doluluk: {{ item.doluluk_orani }}%</span>
+                    <span class="bilgi-etiket">Bozulma riski: {{ item.bozulma_riski }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="kritik-bos" id="kritik-bos">Kritik seviyenin altında silo bulunmuyor.</p>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Chart.js interaktif grafikler -->
+<section>
+    <h2 class="bolum-baslik">İnteraktif Grafikler</h2>
+    <div class="grafik-grid">
+        <div class="kart grafik-kart">
+            <h3 class="bolum-baslik">Kategori Bazlı Doluluk</h3>
+            <div class="chart-kapsayici"><canvas id="chart-kategori"></canvas></div>
+        </div>
+        <div class="kart grafik-kart">
+            <h3 class="bolum-baslik">Rota Maliyet Karşılaştırması</h3>
+            <div class="chart-kapsayici"><canvas id="chart-rota"></canvas></div>
+        </div>
+        <div class="kart grafik-kart" style="grid-column: 1 / -1; max-width: 900px;">
+            <h3 class="bolum-baslik">Talep Tahmini</h3>
+            <div class="chart-kapsayici"><canvas id="chart-talep"></canvas></div>
+        </div>
+    </div>
+</section>
+
+<!-- Matplotlib PNG rapor grafikleri -->
+<section class="png-bolum">
+    <h2 class="bolum-baslik">Rapor Grafikleri (PNG)</h2>
+    <div class="grafik-grid">
+        <div class="kart grafik-kart">
+            <p class="png-etiket">Matplotlib / Seaborn</p>
+            <h3 class="bolum-baslik">Silo Doluluk Isı Haritası</h3>
+            <img class="grafik-img" id="img-isi" src="{{ url_for('static', filename=grafikler.isi_haritasi) }}?v={{ png_zaman }}" alt="Silo doluluk ısı haritası">
+        </div>
+        <div class="kart grafik-kart">
+            <p class="png-etiket">Matplotlib / Seaborn</p>
+            <h3 class="bolum-baslik">Kategori Bazlı Doluluk</h3>
+            <img class="grafik-img" id="img-kategori" src="{{ url_for('static', filename=grafikler.kategori_doluluk) }}?v={{ png_zaman }}" alt="Kategori doluluk">
+        </div>
+        <div class="kart grafik-kart">
+            <p class="png-etiket">Matplotlib / Seaborn</p>
+            <h3 class="bolum-baslik">Rota Maliyet Karşılaştırması</h3>
+            <img class="grafik-img" id="img-rota" src="{{ url_for('static', filename=grafikler.rota_maliyet) }}?v={{ png_zaman }}" alt="Rota maliyet">
+        </div>
+        <div class="kart grafik-kart">
+            <p class="png-etiket">Matplotlib / Seaborn</p>
+            <h3 class="bolum-baslik">Sıcaklık — Fire Korelasyonu</h3>
+            <img class="grafik-img" id="img-sicaklik" src="{{ url_for('static', filename=grafikler.sicaklik_fire) }}?v={{ png_zaman }}" alt="Sıcaklık fire">
+        </div>
+        <div class="kart grafik-kart" style="grid-column: 1 / -1; max-width: 900px;">
+            <p class="png-etiket">Matplotlib / Seaborn</p>
+            <h3 class="bolum-baslik">Talep Tahmini</h3>
+            <img class="grafik-img" id="img-talep" src="{{ url_for('static', filename=grafikler.talep_tahmini) }}?v={{ png_zaman }}" alt="Talep tahmini">
+        </div>
+    </div>
+</section>
+
+<!-- Silo detay tablosu -->
+<section class="kart" style="margin-bottom:2rem">
+    <h2 class="bolum-baslik">Silo Detayları</h2>
+    <div class="tablo-arac">
+        <input type="text" class="arama-kutusu" id="silo-arama" placeholder="Silo ID veya ürün adı ara...">
+        <span class="sayfalama-bilgi" id="tablo-bilgi"></span>
+    </div>
+    <table class="tablo" id="silo-tablo">
+        <thead>
+            <tr>
+                <th class="siralanabilir" data-sutun="silo_id">Silo ID</th>
+                <th class="siralanabilir" data-sutun="urun_adi">Ürün</th>
+                <th class="siralanabilir" data-sutun="kategori">Kategori</th>
+                <th class="siralanabilir" data-sutun="doluluk_orani">Doluluk %</th>
+                <th class="siralanabilir" data-sutun="fire_orani">Fire %</th>
+                <th class="siralanabilir" data-sutun="bozulma_riski">Bozulma Riski</th>
+                <th class="siralanabilir" data-sutun="verimlilik_skoru">Verimlilik</th>
+            </tr>
+        </thead>
+        <tbody id="silo-tbody"></tbody>
+    </table>
+    <div class="sayfalama" id="sayfalama"></div>
+</section>
+
+<!-- Alt bölüm -->
+<section class="alt-bolum">
+    <div class="kart">
+        <h3 class="bolum-baslik">Kategori Özeti</h3>
+        <table class="tablo">
+            <thead>
+                <tr><th>Kategori</th><th>Ortalama %</th><th>Min</th><th>Max</th></tr>
+            </thead>
+            <tbody>
+                {% for row in kategori_ozet %}
+                <tr>
+                    <td>{{ row.kategori }}</td>
+                    <td>{{ row.ortalama }}</td>
+                    <td>{{ row.min }}</td>
+                    <td>{{ row.max }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="kart">
+        <h3 class="bolum-baslik">Korelasyon ve Tahmin</h3>
+        {% if korelasyon %}
+        <div class="korelasyon-kutu">
+            <div class="korelasyon-item">
+                <span>Sıcaklık — Fire</span>
+                <strong>{{ korelasyon.sicaklik_fire }}</strong>
+            </div>
+            <div class="korelasyon-item">
+                <span>Nem — Fire</span>
+                <strong>{{ korelasyon.nem_fire }}</strong>
+            </div>
+        </div>
+        {% endif %}
+        {% if talep_katsayi %}
+        <p style="margin-top:1rem; font-size:0.9rem; color:#475569">
+            Lineer tahmin: y = {{ talep_katsayi.egim }}x + {{ talep_katsayi.kesim }}
+        </p>
+        {% endif %}
+        <h3 class="bolum-baslik" style="margin-top:1.5rem">En Yüksek Maliyetli Rotalar</h3>
+        <table class="tablo">
+            <thead>
+                <tr><th>Rota</th><th>TL/km</th><th>Sefer</th></tr>
+            </thead>
+            <tbody>
+                {% for row in rota_ozet %}
+                <tr>
+                    <td>{{ row.rota }}</td>
+                    <td>{{ row.ortalama_maliyet_km }}</td>
+                    <td>{{ row.sefer_sayisi }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="kart" style="margin-bottom:2rem">
+    <h3 class="bolum-baslik">Veri Temizleme Özeti</h3>
+    <p style="font-size:0.9rem; color:#475569; margin-bottom:0.75rem">
+        Eksik değerler medyan ile dolduruldu. Aykırı değerler IQR yöntemiyle tespit edildi.
+    </p>
+    <div style="display:flex; flex-wrap:wrap; gap:0.5rem">
+        {% for tablo, sutunlar in eksik_istatistik.items() %}
+            {% for sutun, adet in sutunlar.items() %}
+                {% if adet > 0 %}
+                <span class="bilgi-etiket">{{ tablo }}.{{ sutun }}: {{ adet }} eksik</span>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+    const RENK_VURGU = "#E11D48";
+    const RENK_IKINCIL = "#475569";
+    const RENK_METIN = "#1A1C1E";
+
+    // Aktif filtre parametreleri
+    function filtreParams() {
+        const p = new URLSearchParams();
+        p.set("kategori", document.getElementById("kategori").value);
+        p.set("rota", document.getElementById("rota").value);
+        p.set("tarih_araligi", document.getElementById("tarih_araligi").value);
+        return p;
+    }
+
+    function saatGuncelle() {
+        const simdi = new Date();
+        const s = simdi.toLocaleTimeString("tr-TR");
+        document.getElementById("son-guncelleme").textContent = "Son güncelleme: " + s;
+    }
+
+    // --- Özet kartları güncelle ---
+    function ozetGuncelle() {
+        fetch("/api/ozet?" + filtreParams().toString())
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById("ozet-silo").textContent = data.toplam_silo;
+                document.getElementById("ozet-doluluk").innerHTML = data.ortalama_doluluk + '<span style="font-size:1.2rem">%</span>';
+                document.getElementById("ozet-fire").innerHTML = data.ortalama_fire + '<span style="font-size:1.2rem">%</span>';
+                document.getElementById("ozet-kritik").textContent = data.kritik_sayisi;
+                kritikGuncelle(data.kritik_stok);
+                saatGuncelle();
+            })
+            .catch(() => {});
+    }
+
+    function kritikGuncelle(liste) {
+        const konteyner = document.getElementById("kritik-konteyner");
+        if (!liste || liste.length === 0) {
+            konteyner.innerHTML = '<p class="kritik-bos" id="kritik-bos">Kritik seviyenin altında silo bulunmuyor.</p>';
+            return;
+        }
+        let html = '<div class="kritik-grid" id="kritik-grid">';
+        liste.forEach(item => {
+            html += '<div class="kritik-kart">';
+            html += '<div class="silo-id">' + item.silo_id + '</div>';
+            html += '<div>' + item.urun_adi + ' &mdash; ' + item.kategori + '</div>';
+            html += '<div style="margin-top:0.4rem">';
+            html += '<span class="bilgi-etiket">Doluluk: ' + item.doluluk_orani + '%</span>';
+            html += '<span class="bilgi-etiket">Bozulma riski: ' + item.bozulma_riski + '</span>';
+            html += '</div></div>';
+        });
+        html += '</div>';
+        konteyner.innerHTML = html;
+    }
+
+    // --- Chart.js ---
+    let chartKategori, chartRota, chartTalep;
+
+    const chartOpts = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: RENK_METIN } } },
+        scales: {
+            x: { ticks: { color: RENK_IKINCIL }, grid: { color: "#E2E8F0" } },
+            y: { ticks: { color: RENK_IKINCIL }, grid: { color: "#E2E8F0" } }
+        }
+    };
+
+    function grafikleriGuncelle() {
+        fetch("/api/grafik-veri?" + filtreParams().toString())
+            .then(r => r.json())
+            .then(d => {
+                if (chartKategori) chartKategori.destroy();
+                if (chartRota) chartRota.destroy();
+                if (chartTalep) chartTalep.destroy();
+
+                chartKategori = new Chart(document.getElementById("chart-kategori"), {
+                    type: "bar",
+                    data: {
+                        labels: d.kategori_doluluk.etiketler,
+                        datasets: [{
+                            label: "Ortalama Doluluk (%)",
+                            data: d.kategori_doluluk.degerler,
+                            backgroundColor: RENK_VURGU,
+                            borderRadius: 6
+                        }]
+                    },
+                    options: chartOpts
+                });
+
+                chartRota = new Chart(document.getElementById("chart-rota"), {
+                    type: "bar",
+                    data: {
+                        labels: d.rota_maliyet.etiketler,
+                        datasets: [{
+                            label: "Maliyet (TL/km)",
+                            data: d.rota_maliyet.degerler,
+                            backgroundColor: RENK_IKINCIL,
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        ...chartOpts,
+                        indexAxis: "y"
+                    }
+                });
+
+                const gecmisEt = d.talep_tahmini.gecmis_etiketler;
+                const gecmisDe = d.talep_tahmini.gecmis_degerler;
+                const tahminEt = d.talep_tahmini.tahmin_etiketler;
+                const tahminDe = d.talep_tahmini.tahmin_degerler;
+                const tumEt = gecmisEt.concat(tahminEt);
+                const gecmisPad = gecmisDe.concat(new Array(tahminEt.length).fill(null));
+                const tahminPad = new Array(gecmisEt.length - 1).fill(null).concat([gecmisDe[gecmisDe.length - 1]]).concat(tahminDe);
+
+                chartTalep = new Chart(document.getElementById("chart-talep"), {
+                    type: "line",
+                    data: {
+                        labels: tumEt,
+                        datasets: [
+                            {
+                                label: "Geçmiş Sefer",
+                                data: gecmisPad,
+                                borderColor: RENK_IKINCIL,
+                                backgroundColor: "transparent",
+                                tension: 0.3,
+                                pointRadius: 4
+                            },
+                            {
+                                label: "Tahmin",
+                                data: tahminPad,
+                                borderColor: RENK_VURGU,
+                                borderDash: [6, 4],
+                                backgroundColor: "transparent",
+                                tension: 0.3,
+                                pointRadius: 4
+                            }
+                        ]
+                    },
+                    options: chartOpts
+                });
+            })
+            .catch(() => {});
+    }
+
+    // --- Silo tablosu ---
+    let siloVeri = [];
+    let siralananSutun = "silo_id";
+    let artan = true;
+    let mevcutSayfa = 1;
+    const sayfaBoyutu = 10;
+    let aramaMetni = "";
+
+    function skorSinifi(skor) {
+        if (skor >= 70) return "skor-yesil";
+        if (skor >= 40) return "skor-sari";
+        return "skor-kirmizi";
+    }
+
+    function silolariYukle() {
+        fetch("/api/silolar?" + filtreParams().toString())
+            .then(r => r.json())
+            .then(d => {
+                siloVeri = d.silolar;
+                mevcutSayfa = 1;
+                tabloCiz();
+            })
+            .catch(() => {});
+    }
+
+    function filtrelenmisVeri() {
+        const q = aramaMetni.toLowerCase();
+        let liste = siloVeri;
+        if (q) {
+            liste = liste.filter(s =>
+                s.silo_id.toLowerCase().includes(q) ||
+                s.urun_adi.toLowerCase().includes(q)
+            );
+        }
+        liste = [...liste].sort((a, b) => {
+            let va = a[siralananSutun], vb = b[siralananSutun];
+            if (typeof va === "string") { va = va.toLowerCase(); vb = vb.toLowerCase(); }
+            if (va < vb) return artan ? -1 : 1;
+            if (va > vb) return artan ? 1 : -1;
+            return 0;
+        });
+        return liste;
+    }
+
+    function tabloCiz() {
+        const liste = filtrelenmisVeri();
+        const toplamSayfa = Math.max(1, Math.ceil(liste.length / sayfaBoyutu));
+        if (mevcutSayfa > toplamSayfa) mevcutSayfa = toplamSayfa;
+
+        const baslangic = (mevcutSayfa - 1) * sayfaBoyutu;
+        const sayfa = liste.slice(baslangic, baslangic + sayfaBoyutu);
+
+        const tbody = document.getElementById("silo-tbody");
+        tbody.innerHTML = "";
+        sayfa.forEach(s => {
+            const tr = document.createElement("tr");
+            tr.innerHTML =
+                "<td>" + s.silo_id + "</td>" +
+                "<td>" + s.urun_adi + "</td>" +
+                "<td>" + s.kategori + "</td>" +
+                "<td>" + s.doluluk_orani + "</td>" +
+                "<td>" + s.fire_orani + "</td>" +
+                "<td>" + s.bozulma_riski + "</td>" +
+                '<td class="' + skorSinifi(s.verimlilik_skoru) + '">' + s.verimlilik_skoru + "</td>";
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById("tablo-bilgi").textContent =
+            liste.length + " kayıt, sayfa " + mevcutSayfa + "/" + toplamSayfa;
+
+        const sayfDiv = document.getElementById("sayfalama");
+        sayfDiv.innerHTML = "";
+
+        const onceki = document.createElement("button");
+        onceki.textContent = "Önceki";
+        onceki.disabled = mevcutSayfa <= 1;
+        onceki.onclick = () => { mevcutSayfa--; tabloCiz(); };
+        sayfDiv.appendChild(onceki);
+
+        for (let i = 1; i <= toplamSayfa; i++) {
+            const btn = document.createElement("button");
+            btn.textContent = i;
+            if (i === mevcutSayfa) btn.classList.add("aktif");
+            btn.onclick = ((p) => () => { mevcutSayfa = p; tabloCiz(); })(i);
+            sayfDiv.appendChild(btn);
+        }
+
+        const sonraki = document.createElement("button");
+        sonraki.textContent = "Sonraki";
+        sonraki.disabled = mevcutSayfa >= toplamSayfa;
+        sonraki.onclick = () => { mevcutSayfa++; tabloCiz(); };
+        sayfDiv.appendChild(sonraki);
+    }
+
+    // Sıralama tıklama
+    document.querySelectorAll("#silo-tablo th.siralanabilir").forEach(th => {
+        th.addEventListener("click", () => {
+            const sutun = th.dataset.sutun;
+            if (siralananSutun === sutun) artan = !artan;
+            else { siralananSutun = sutun; artan = true; }
+            tabloCiz();
+        });
+    });
+
+    document.getElementById("silo-arama").addEventListener("input", (e) => {
+        aramaMetni = e.target.value;
+        mevcutSayfa = 1;
+        tabloCiz();
+    });
+
+    // Filtre değişince otomatik gönder
+    ["kategori", "rota", "tarih_araligi"].forEach(id => {
+        document.getElementById(id).addEventListener("change", () => {
+            document.getElementById("filtre-form").submit();
+        });
+    });
+
+    // Yeni veri üret
+    document.getElementById("btn-yeni-veri").addEventListener("click", function() {
+        const btn = this;
+        btn.disabled = true;
+        btn.textContent = "Üretiliyor...";
+        fetch("/yeni-veri", {
+            method: "POST",
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+        .then(r => r.json())
+        .then(() => { window.location.reload(); })
+        .catch(() => {
+            btn.disabled = false;
+            btn.textContent = "Yeni Veri Üret";
+        });
+    });
+
+    // Auto-refresh: her 10 saniyede özet kartları güncelle
+    saatGuncelle();
+    grafikleriGuncelle();
+    silolariYukle();
+    setInterval(ozetGuncelle, 10000);
+})();
+</script>
+{% endblock %}

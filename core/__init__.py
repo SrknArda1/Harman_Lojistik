@@ -1,0 +1,1 @@
+# HarmanLojistik çekirdek analiz modülü

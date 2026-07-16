@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HarmanLojistik{% endblock %}</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+            background-color: #FAFAFA;
+            color: #1A1C1E;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: #FFFFFF;
+            border-bottom: 1px solid #E2E8F0;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header h1 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .header h1 span { color: #E11D48; }
+
+        .header nav a {
+            color: #475569;
+            text-decoration: none;
+            margin-left: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .header nav a:hover { color: #E11D48; }
+
+        main {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .kart {
+            background: #FFFFFF;
+            border-radius: 12px;
+            border: 1px solid #E2E8F0;
+            padding: 1.5rem;
+        }
+
+        .kart-baslik {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #475569;
+            margin-bottom: 0.5rem;
+        }
+
+        .kart-deger {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1A1C1E;
+        }
+
+        .kart-birim {
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
+        .bolum-baslik {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1A1C1E;
+        }
+
+        .kritik-kart {
+            background: #FFF1F2;
+            border: 1px solid #FECDD3;
+            border-left: 4px solid #E11D48;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+        }
+
+        .kritik-kart .silo-id {
+            font-weight: 700;
+            color: #E11D48;
+        }
+
+        .grafik-img {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .tablo {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .tablo th, .tablo td {
+            padding: 0.6rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .tablo th {
+            color: #475569;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #475569;
+            font-size: 0.85rem;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="header">
+        <h1>Harman<span>Lojistik</span></h1>
+        <nav>
+            <a href="/">Dashboard</a>
+            <a href="/api/depo">API Depo</a>
+            <a href="/api/nakliye">API Nakliye</a>
+            <a href="/api/ozet">API Özet</a>
+            <a href="/api/silolar">API Silolar</a>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        HarmanLojistik &mdash; Veri Analitiği Destekli Tarım Deposu ve Nakliye Takip Sistemi
+    </footer>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
