@@ -19,6 +19,7 @@ Tarayıcıda **http://localhost:5000** adresini açın.
 ## Proje Yapısı
 
 
+
 ```
 harmanlojistik/
 ├── data/                  # CSV veri dosyaları
